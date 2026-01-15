@@ -8,10 +8,15 @@ import com.example.employeeManagementSystem.model.entity.Employee;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -74,6 +79,44 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    @Transactional
+    public List<EmployeeResponseDto> updateEmployeeByName(EmployeeRequestDto employeeRequestDto, String name) {
+        List<Employee> existingEmployeeList = employeeRepository.findByName(name);
+
+        if(existingEmployeeList.isEmpty()){
+            throw new ResourceNotFoundException("Resource not found for the name : "+name);
+        }
+
+        List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<>();
+
+        for(Employee existingEmployee : existingEmployeeList){
+            existingEmployee.setSalary(employeeRequestDto.salary());
+            existingEmployee.setDepartment(employeeRequestDto.department());
+            existingEmployee.setEmail(employeeRequestDto.email());
+            existingEmployee.setName(employeeRequestDto.name());
+
+            //save
+            Employee saved = employeeRepository.save(existingEmployee);
+
+            //map to dto
+            employeeResponseDtoList.add(mapToResponseDto(saved));
+
+        }
+
+        return employeeResponseDtoList;
+
+    }
+
+    public EmployeeResponseDto mapToResponseDto(Employee employee){
+        EmployeeResponseDto employeeResponseDto = new EmployeeResponseDto();
+        employeeResponseDto.setName(employee.getName());
+        employeeResponseDto.setSalary(employee.getSalary());
+        employeeResponseDto.setDepartment(employee.getDepartment());
+        employeeResponseDto.setEmail(employee.getEmail());
+        employeeResponseDto.setId(employee.getId());
+        return employeeResponseDto;
+    }
 
 
 }

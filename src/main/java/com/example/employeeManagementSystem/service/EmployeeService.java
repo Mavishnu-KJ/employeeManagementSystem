@@ -14,4 +14,5 @@ public interface EmployeeService {
     List<EmployeeResponseDto> getAllEmployees();
     EmployeeResponseDto searchEmployeeById(Long id);
     EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id);
+    List<EmployeeResponseDto> updateEmployeeByName(EmployeeRequestDto employeeRequestDto, String name);
 }

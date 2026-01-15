@@ -10,5 +10,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findByNameContaining(String name);
     List<Employee> findBySalaryGreaterThan(Integer salary);
     List<Employee> findByIdAndName(Long id, String name);
+    List<Employee> findByName(String name);
 }
 

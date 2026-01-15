@@ -1,5 +1,6 @@
 package com.example.employeeManagementSystem.controller;
 
+import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
@@ -44,6 +45,19 @@ public class EmployeeController {
     public ResponseEntity<EmployeeResponseDto> updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
         EmployeeResponseDto updated = employeeService.updateEmployeeById(employeeRequestDto, id);
         return ResponseEntity.status(HttpStatus.OK).body(updated);
+    }
+
+    @PutMapping("/updateEmployeeByName/{name}")
+    public ResponseEntity<List<EmployeeResponseDto>> updateEmployeeByName(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable ("name") String name){
+
+        List<EmployeeResponseDto> updatedList = employeeService.updateEmployeeByName(employeeRequestDto, name);
+
+        if(updatedList==null || updatedList.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(updatedList);
+
     }
 
 }
