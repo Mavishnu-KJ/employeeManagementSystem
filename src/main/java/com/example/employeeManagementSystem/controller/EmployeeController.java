@@ -35,6 +35,7 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     EmployeeResponseDto getById(@PathVariable Long id) throws IOException{
+
         return employeeService.getById(id);
     }
 
