@@ -59,16 +59,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
+    @Transactional
     public EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id){
-        Employee employee = employeeRepository.findById(id)
-                .orElse(new Employee());
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Resource not found for the given id: "+id));
 
-        employee.setName(employeeRequestDto.name());
-        employee.setSalary(employeeRequestDto.salary());
-        employee.setDepartment(employeeRequestDto.department());
-        employee.setEmail(employeeRequestDto.email());
+        existingEmployee.setName(employeeRequestDto.name());
+        existingEmployee.setSalary(employeeRequestDto.salary());
+        existingEmployee.setDepartment(employeeRequestDto.department());
+        existingEmployee.setEmail(employeeRequestDto.email());
 
-        Employee saved = employeeRepository.save(employee);
+        Employee saved = employeeRepository.save(existingEmployee);
         return mapper.map(saved, EmployeeResponseDto.class);
 
     }

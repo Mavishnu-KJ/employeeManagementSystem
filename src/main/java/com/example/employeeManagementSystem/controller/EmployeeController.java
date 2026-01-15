@@ -45,9 +45,9 @@ public class EmployeeController {
     }
 
     @PutMapping("/update/{id}")
-    EmployeeResponseDto updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
+    public ResponseEntity<EmployeeResponseDto> updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
         EmployeeResponseDto updated = employeeService.updateEmployeeById(employeeRequestDto, id);
-        return ResponseEntity.status(HttpStatus.OK).body(updated).getBody();
+        return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
 
 }
