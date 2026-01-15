@@ -1,5 +1,6 @@
 package com.example.employeeManagementSystem.service.impl;
 
+import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.repository.EmployeeRepository;
@@ -46,9 +47,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .toList();
     }
 
-    public EmployeeResponseDto getById(Long id) throws IOException {
+    public EmployeeResponseDto getById(Long id) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(()->new IOException("Employee not found with id: " + id));
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
