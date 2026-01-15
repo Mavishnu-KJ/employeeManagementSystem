@@ -69,8 +69,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setDepartment(employeeRequestDto.department());
         existingEmployee.setEmail(employeeRequestDto.email());
 
-        Employee saved = employeeRepository.save(existingEmployee);
-        return mapper.map(saved, EmployeeResponseDto.class);
+        Employee updated = employeeRepository.save(existingEmployee);
+        return mapper.map(updated, EmployeeResponseDto.class);
 
     }
 
