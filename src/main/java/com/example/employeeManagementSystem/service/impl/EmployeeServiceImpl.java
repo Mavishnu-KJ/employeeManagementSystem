@@ -1,0 +1,46 @@
+package com.example.employeeManagementSystem.service.impl;
+
+import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
+import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
+import com.example.employeeManagementSystem.repository.EmployeeRepository;
+import com.example.employeeManagementSystem.model.entity.Employee;
+import com.example.employeeManagementSystem.service.EmployeeService;
+import jakarta.transaction.Transactional;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+
+
+@Service
+public class EmployeeServiceImpl implements EmployeeService {
+    private final EmployeeRepository employeeRepository;
+    private final ModelMapper mapper;
+
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper mapper) {
+        this.employeeRepository = employeeRepository;
+        this.mapper = mapper;
+    }
+
+
+    @Transactional
+    public EmployeeResponseDto create(EmployeeRequestDto employeeRequestDto){
+        Employee employee = mapper.map(employeeRequestDto, Employee.class);
+        Employee saved = employeeRepository.save(employee);
+        return mapper.map(saved, EmployeeResponseDto.class);
+    }
+
+    public List<EmployeeResponseDto> getAll(){
+        return employeeRepository.findAll().stream()
+                .map(employee->mapper.map(employee,EmployeeResponseDto.class))
+                .toList();
+    }
+
+    public EmployeeResponseDto getById(Long id) throws IOException {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(()->new IOException("Employee not found with id: " + id));
+        return mapper.map(employee, EmployeeResponseDto.class);
+    }
+
+}
