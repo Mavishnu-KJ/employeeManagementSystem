@@ -12,4 +12,5 @@ public interface EmployeeService {
     List<EmployeeResponseDto> getAll();
     EmployeeResponseDto getById(Long id) throws IOException;
     EmployeeResponseDto searchEmployee(Long id) throws IOException;
+    EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id);
 }

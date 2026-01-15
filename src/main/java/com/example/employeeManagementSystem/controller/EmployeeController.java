@@ -22,7 +22,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<EmployeeResponseDto> create(@Valid @RequestBody EmployeeRequestDto employeeRequestDto){
         EmployeeResponseDto saved = employeeService.create(employeeRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
@@ -42,6 +42,12 @@ public class EmployeeController {
     @GetMapping("/search") //http://localhost:8080/api/employees/search?id={id}
     EmployeeResponseDto searchEmployee(@RequestParam("id") Long id) throws IOException{
         return employeeService.searchEmployee(id);
+    }
+
+    @PutMapping("/update/{id}")
+    EmployeeResponseDto updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
+        EmployeeResponseDto saved = employeeService.updateEmployeeById(employeeRequestDto, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved).getBody();
     }
 
 }

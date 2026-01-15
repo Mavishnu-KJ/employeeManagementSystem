@@ -58,4 +58,20 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
+    public EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id){
+        Employee employee = employeeRepository.findById(id)
+                .orElse(new Employee());
+
+        employee.setName(employeeRequestDto.name());
+        employee.setSalary(employeeRequestDto.salary());
+        employee.setDepartment(employeeRequestDto.department());
+        employee.setEmail(employeeRequestDto.email());
+
+        Employee saved = employeeRepository.save(employee);
+        return mapper.map(saved, EmployeeResponseDto.class);
+
+    }
+
+
+
 }
