@@ -22,26 +22,25 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<EmployeeResponseDto> create(@Valid @RequestBody EmployeeRequestDto employeeRequestDto){
-        EmployeeResponseDto saved = employeeService.create(employeeRequestDto);
+    @PostMapping("/addEmployee")
+    public ResponseEntity<EmployeeResponseDto> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto){
+        EmployeeResponseDto saved = employeeService.addEmployee(employeeRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    @GetMapping
-    public List<EmployeeResponseDto> getAll(){
-        return employeeService.getAll();
-    }
-
     @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
-    EmployeeResponseDto getById(@PathVariable Long id) throws IOException{
-
-        return employeeService.getById(id);
+    EmployeeResponseDto getEmployeeById(@PathVariable Long id){
+        return employeeService.getEmployeeById(id);
     }
 
-    @GetMapping("/search") //http://localhost:8080/api/employees/search?id={id}
-    EmployeeResponseDto searchEmployee(@RequestParam("id") Long id) throws IOException{
-        return employeeService.searchEmployee(id);
+    @GetMapping
+    public List<EmployeeResponseDto> getAllEmployees(){
+        return employeeService.getAllEmployees();
+    }
+
+    @GetMapping("/searchEmployeeById") //http://localhost:8080/api/employees/searchEmployeeById?id={id}&name={name}
+    EmployeeResponseDto searchEmployeeById(@Valid @RequestParam("id") Long id){
+        return employeeService.searchEmployeeById(id);
     }
 
     @PutMapping("/update/{id}")

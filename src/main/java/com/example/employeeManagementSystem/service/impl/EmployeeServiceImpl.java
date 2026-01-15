@@ -26,7 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 
     @Transactional
-    public EmployeeResponseDto create(EmployeeRequestDto employeeRequestDto){
+    public EmployeeResponseDto addEmployee(EmployeeRequestDto employeeRequestDto){
         System.out.println("employeeRequestDto is "+employeeRequestDto);
         //Employee employee = mapper.map(employeeRequestDto, Employee.class); //ModelMapper did not work
         //System.out.println("employee is "+employee);
@@ -41,21 +41,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.map(saved, EmployeeResponseDto.class);
     }
 
-    public List<EmployeeResponseDto> getAll(){
-        return employeeRepository.findAll().stream()
-                .map(employee->mapper.map(employee,EmployeeResponseDto.class))
-                .toList();
-    }
-
-    public EmployeeResponseDto getById(Long id) {
+    public EmployeeResponseDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
-    public EmployeeResponseDto searchEmployee(Long id) throws IOException {
+    public List<EmployeeResponseDto> getAllEmployees(){
+        return employeeRepository.findAll().stream()
+                .map(employee->mapper.map(employee,EmployeeResponseDto.class))
+                .toList();
+    }
+
+    public EmployeeResponseDto searchEmployeeById(Long id){
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(()->new IOException("Employee not found with id: " + id));
+                .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 

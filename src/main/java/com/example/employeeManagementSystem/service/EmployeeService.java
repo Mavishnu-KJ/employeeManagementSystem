@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface EmployeeService {
-    EmployeeResponseDto create(EmployeeRequestDto employeeRequestDto);
-    List<EmployeeResponseDto> getAll();
-    EmployeeResponseDto getById(Long id);
-    EmployeeResponseDto searchEmployee(Long id) throws IOException;
+    EmployeeResponseDto addEmployee(EmployeeRequestDto employeeRequestDto);
+    EmployeeResponseDto getEmployeeById(Long id);
+    List<EmployeeResponseDto> getAllEmployees();
+    EmployeeResponseDto searchEmployeeById(Long id);
     EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id);
 }
