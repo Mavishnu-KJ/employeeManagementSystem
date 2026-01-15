@@ -5,8 +5,9 @@ public class EmployeeResponseDto
     private Long id;
     private String name;
     private Integer salary;
-    private String department;
     private String email;
+    private String department;
+
 
     // Required: No-arg constructor for ModelMapper
     public EmployeeResponseDto() {
@@ -51,4 +52,5 @@ public class EmployeeResponseDto
     public void setEmail(String email) {
         this.email = email;
     }
+
 }

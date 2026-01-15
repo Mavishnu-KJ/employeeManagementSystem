@@ -26,8 +26,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     public EmployeeResponseDto create(EmployeeRequestDto employeeRequestDto){
-        Employee employee = mapper.map(employeeRequestDto, Employee.class);
+        System.out.println("employeeRequestDto is "+employeeRequestDto);
+        //Employee employee = mapper.map(employeeRequestDto, Employee.class); //ModelMapper did not work
+        //System.out.println("employee is "+employee);
+        Employee employee = new Employee();
+        employee.setName(employeeRequestDto.name());
+        employee.setSalary(employeeRequestDto.salary());
+        employee.setDepartment(employeeRequestDto.department());
+        employee.setEmail(employeeRequestDto.email());
+        //System.out.println("Employee is "+employee);
         Employee saved = employeeRepository.save(employee);
+        //System.out.println("Employed saved is "+saved);
         return mapper.map(saved, EmployeeResponseDto.class);
     }
 
