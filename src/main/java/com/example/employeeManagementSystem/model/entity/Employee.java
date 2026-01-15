@@ -13,13 +13,13 @@ public class Employee {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Name is required")
+
     private String name;
 
-    @Positive(message = "Salary must be positive")
+
     private Integer salary;
 
-    @Email(message = "Invalid email")
+
     private String email;
 
     private String department;
