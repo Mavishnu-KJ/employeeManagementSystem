@@ -52,4 +52,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
+    public EmployeeResponseDto searchEmployee(Long id) throws IOException {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(()->new IOException("Employee not found with id: " + id));
+        return mapper.map(employee, EmployeeResponseDto.class);
+    }
+
 }

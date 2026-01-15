@@ -33,10 +33,15 @@ public class EmployeeController {
         return employeeService.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
     EmployeeResponseDto getById(@PathVariable Long id) throws IOException{
 
         return employeeService.getById(id);
+    }
+
+    @GetMapping("/search") //http://localhost:8080/api/employees/search?id={id}
+    EmployeeResponseDto searchEmployee(@RequestParam("id") Long id) throws IOException{
+        return employeeService.searchEmployee(id);
     }
 
 }

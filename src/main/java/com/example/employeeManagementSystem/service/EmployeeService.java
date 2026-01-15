@@ -11,4 +11,5 @@ public interface EmployeeService {
     EmployeeResponseDto create(EmployeeRequestDto employeeRequestDto);
     List<EmployeeResponseDto> getAll();
     EmployeeResponseDto getById(Long id) throws IOException;
+    EmployeeResponseDto searchEmployee(Long id) throws IOException;
 }
