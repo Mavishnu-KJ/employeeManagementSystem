@@ -114,7 +114,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeResponseDto.setSalary(employee.getSalary());
         employeeResponseDto.setDepartment(employee.getDepartment());
         employeeResponseDto.setEmail(employee.getEmail());
-        employeeResponseDto.setId(employee.getId());
+        if(employee.getId()!=null) employeeResponseDto.setId(employee.getId());
         return employeeResponseDto;
     }
 
@@ -155,4 +155,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeResponseDtoList;
     }
+
+    @Override
+    @Transactional
+    public void deleteEmployeeById(Long id){
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Resource not found for the Id: "+id));
+
+        //Delete
+        employeeRepository.delete(employee);
+
+    }
+
+
 }

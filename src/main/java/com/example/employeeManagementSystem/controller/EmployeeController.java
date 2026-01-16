@@ -5,11 +5,15 @@ import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.List;
 
 
@@ -28,7 +32,15 @@ public class EmployeeController {
     @PostMapping("/addEmployee")
     public ResponseEntity<EmployeeResponseDto> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto){
         EmployeeResponseDto saved = employeeService.addEmployee(employeeRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .replacePath("/api/employees/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+
+        //return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        return ResponseEntity.created(location).body(saved);
     }
 
     @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
@@ -72,9 +84,19 @@ public class EmployeeController {
         logger.info("Controller entered addEmployees, employeeRequestDtoList is {}",employeeRequestDtoList);
         List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
 
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().build().toUri();
         //return ResponseEntity.ok(employeesAdded);
-        return ResponseEntity.status(HttpStatus.CREATED).body(employeesAdded);
+        //return ResponseEntity.status(HttpStatus.CREATED).body(employeesAdded);
+        return ResponseEntity.created(location).body(employeesAdded);
 
+    }
+
+    @DeleteMapping("/deleteEmployeeById/{id}")
+    public ResponseEntity<HttpStatus> deleteEmployeeById(@PathVariable("id") Long id){
+        employeeService.deleteEmployeeById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
