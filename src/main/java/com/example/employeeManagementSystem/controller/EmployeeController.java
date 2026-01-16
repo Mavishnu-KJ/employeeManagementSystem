@@ -5,14 +5,19 @@ import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     private final EmployeeService employeeService;
 
@@ -58,6 +63,16 @@ public class EmployeeController {
         }
 
         return ResponseEntity.ok(updatedList);
+
+    }
+
+    @PostMapping("/addEmployees")
+    public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@RequestBody List<EmployeeRequestDto> employeeRequestDtoList){
+
+        logger.info("Controller entered addEmployees, employeeRequestDtoList is {}",employeeRequestDtoList);
+        List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
+
+        return ResponseEntity.ok(employeesAdded);
 
     }
 

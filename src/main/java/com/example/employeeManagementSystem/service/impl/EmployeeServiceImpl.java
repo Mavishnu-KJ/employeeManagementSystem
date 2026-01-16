@@ -118,5 +118,41 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeResponseDto;
     }
 
+    public Employee mapEmployeeRequestDtoToEmployeeEntity(EmployeeRequestDto employeeRequestDto){
+        Employee employee = new Employee();
+        employee.setName(employeeRequestDto.name());
+        employee.setSalary(employeeRequestDto.salary());
+        employee.setDepartment(employeeRequestDto.department());
+        employee.setEmail(employeeRequestDto.email());
+        //employee.setId(employeeRequestDto.getId());
+        return employee;
+    }
 
+    @Override
+    @Transactional
+    public List<EmployeeResponseDto> addEmployees(List<EmployeeRequestDto> employeeRequestDtoList){
+        List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<EmployeeResponseDto>();
+
+        List<Employee> employeeList = new ArrayList<Employee>();
+
+        if(employeeRequestDtoList == null || employeeRequestDtoList.isEmpty()){
+            throw new ResourceNotFoundException("No Employees data found to add");
+        }
+
+        for(EmployeeRequestDto employeeRequestDto : employeeRequestDtoList){
+            employeeList.add(mapEmployeeRequestDtoToEmployeeEntity(employeeRequestDto));
+        }
+
+        //save
+        List<Employee> employeeListAdded = employeeRepository.saveAll(employeeList);
+
+        //Map to ResponseDto
+        if(employeeListAdded !=null && !employeeListAdded.isEmpty()){
+            for(Employee emp : employeeListAdded){
+                employeeResponseDtoList.add(mapToResponseDto(emp));
+            }
+        }
+
+        return employeeResponseDtoList;
+    }
 }
