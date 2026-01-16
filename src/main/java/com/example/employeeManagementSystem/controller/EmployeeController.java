@@ -72,7 +72,8 @@ public class EmployeeController {
         logger.info("Controller entered addEmployees, employeeRequestDtoList is {}",employeeRequestDtoList);
         List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
 
-        return ResponseEntity.ok(employeesAdded);
+        //return ResponseEntity.ok(employeesAdded);
+        return ResponseEntity.status(HttpStatus.CREATED).body(employeesAdded);
 
     }
 
