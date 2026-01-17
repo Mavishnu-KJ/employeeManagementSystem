@@ -64,6 +64,7 @@ public class EmployeeController {
 
     @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
     EmployeeResponseDto getEmployeeById(@PathVariable Long id){
+        logger.info("getEmployeeById, id is {}", id);
         return employeeService.getEmployeeById(id);
     }
 
