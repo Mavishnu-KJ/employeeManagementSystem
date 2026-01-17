@@ -47,6 +47,21 @@ public class EmployeeController {
         return ResponseEntity.created(location).body(added); // 201 created
     }
 
+    @PostMapping("/addEmployees") //http://localhost:8080/api/employees/addEmployees
+    public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@RequestBody List<EmployeeRequestDto> employeeRequestDtoList){
+        logger.info("addEmployees, employeeRequestDtoList is {}", employeeRequestDtoList);
+        List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest().build().toUri();
+
+        logger.info("addEmployees, employeesAdded is {}", employeesAdded);
+
+        //return ResponseEntity.status(HttpStatus.CREATED).body(employeesAdded);
+        return ResponseEntity.created(location).body(employeesAdded);
+
+    }
+
     @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
     EmployeeResponseDto getEmployeeById(@PathVariable Long id){
         return employeeService.getEmployeeById(id);
@@ -79,20 +94,6 @@ public class EmployeeController {
         }
 
         return ResponseEntity.ok(updatedList);
-
-    }
-
-    @PostMapping("/addEmployees")
-    public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@RequestBody List<EmployeeRequestDto> employeeRequestDtoList){
-
-        logger.info("Controller entered addEmployees, employeeRequestDtoList is {}",employeeRequestDtoList);
-        List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().build().toUri();
-        //return ResponseEntity.ok(employeesAdded);
-        //return ResponseEntity.status(HttpStatus.CREATED).body(employeesAdded);
-        return ResponseEntity.created(location).body(employeesAdded);
 
     }
 

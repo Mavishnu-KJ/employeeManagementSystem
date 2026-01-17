@@ -1,6 +1,5 @@
 package com.example.employeeManagementSystem.service.impl;
 
-import com.example.employeeManagementSystem.controller.EmployeeController;
 import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
@@ -31,7 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         this.mapper = mapper;
     }
 
-
+    @Override
     @Transactional
     public EmployeeResponseDto addEmployee(EmployeeRequestDto employeeRequestDto){
         logger.info("addEmployee, employeeRequestDto is {}", employeeRequestDto);
@@ -43,6 +42,48 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee saved = employeeRepository.save(employee);
         logger.info("addEmployee, saved is {}", saved);
         return mapper.map(saved, EmployeeResponseDto.class);
+    }
+
+    @Override
+    @Transactional
+    public List<EmployeeResponseDto> addEmployees(List<EmployeeRequestDto> employeeRequestDtoList){
+        logger.info("addEmployees, employeeRequestDtoList is {}", employeeRequestDtoList);
+        List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<>();
+        List<Employee> employeeList;
+
+        if(employeeRequestDtoList == null || employeeRequestDtoList.isEmpty()){
+            throw new ResourceNotFoundException("No Employees data found to add");
+        }
+
+        employeeList = employeeRequestDtoList.stream().map(this::mapEmployeeRequestDtoToEmployeeEntity).toList();
+
+        /*
+        for(EmployeeRequestDto employeeRequestDto : employeeRequestDtoList){
+            employeeList.add(mapEmployeeRequestDtoToEmployeeEntity(employeeRequestDto));
+        }
+        */
+
+        logger.debug("addEmployees, employeeList is {}", employeeList);
+
+        //saveAll
+        List<Employee> employeeListAdded = employeeRepository.saveAll(employeeList);
+
+        //map EmployeeEntity To EmployeeResponseDto
+        if(employeeListAdded !=null && !employeeListAdded.isEmpty()) {
+            employeeResponseDtoList = employeeListAdded.stream().map(emp -> mapEmployeeEntityToEmployeeResponseDto(emp)).toList();
+        }
+
+        /*
+        //Map to ResponseDto
+        if(employeeListAdded !=null && !employeeListAdded.isEmpty()){
+            for(Employee emp : employeeListAdded){
+                employeeResponseDtoList.add(mapEmployeeEntityToEmployeeResponseDto(emp));
+            }
+        }
+        */
+
+        logger.info("addEmployees, employeeListAdded is {}", employeeListAdded);
+        return employeeResponseDtoList;
     }
 
     public EmployeeResponseDto getEmployeeById(Long id) {
@@ -99,7 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             Employee saved = employeeRepository.save(existingEmployee);
 
             //map to dto
-            employeeResponseDtoList.add(mapToResponseDto(saved));
+            employeeResponseDtoList.add(mapEmployeeEntityToEmployeeResponseDto(saved));
 
         }
 
@@ -107,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    public EmployeeResponseDto mapToResponseDto(Employee employee){
+    public EmployeeResponseDto mapEmployeeEntityToEmployeeResponseDto(Employee employee){
         EmployeeResponseDto employeeResponseDto = new EmployeeResponseDto();
         employeeResponseDto.setName(employee.getName());
         employeeResponseDto.setSalary(employee.getSalary());
@@ -126,33 +167,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employee;
     }
 
-    @Override
-    @Transactional
-    public List<EmployeeResponseDto> addEmployees(List<EmployeeRequestDto> employeeRequestDtoList){
-        List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<EmployeeResponseDto>();
 
-        List<Employee> employeeList = new ArrayList<Employee>();
-
-        if(employeeRequestDtoList == null || employeeRequestDtoList.isEmpty()){
-            throw new ResourceNotFoundException("No Employees data found to add");
-        }
-
-        for(EmployeeRequestDto employeeRequestDto : employeeRequestDtoList){
-            employeeList.add(mapEmployeeRequestDtoToEmployeeEntity(employeeRequestDto));
-        }
-
-        //save
-        List<Employee> employeeListAdded = employeeRepository.saveAll(employeeList);
-
-        //Map to ResponseDto
-        if(employeeListAdded !=null && !employeeListAdded.isEmpty()){
-            for(Employee emp : employeeListAdded){
-                employeeResponseDtoList.add(mapToResponseDto(emp));
-            }
-        }
-
-        return employeeResponseDtoList;
-    }
 
     @Override
     @Transactional
@@ -170,7 +185,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Page<Employee> employeeList = employeeRepository.findAll(pageable);
 
         //map to ResponseDTO
-        return employeeList.map(emp->mapToResponseDto(emp)); // emp->mapToResponseDto(emp) can be this::mapToResponseDto
+        return employeeList.map(emp-> mapEmployeeEntityToEmployeeResponseDto(emp)); // emp->mapEmployeeEntityToEmployeeResponseDto(emp) can be this::mapEmployeeEntityToEmployeeResponseDto
     }
 
 
