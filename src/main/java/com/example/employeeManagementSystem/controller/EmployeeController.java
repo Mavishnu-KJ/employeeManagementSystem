@@ -1,18 +1,19 @@
 package com.example.employeeManagementSystem.controller;
 
-import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import java.net.URI;
 import java.util.List;
 
@@ -24,23 +25,26 @@ public class EmployeeController {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
 
     private final EmployeeService employeeService;
-
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
-    @PostMapping("/addEmployee")
+    @PostMapping("/addEmployee") //http://localhost:8080/api/employees/addEmployee
     public ResponseEntity<EmployeeResponseDto> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto){
-        EmployeeResponseDto saved = employeeService.addEmployee(employeeRequestDto);
+        logger.info("addEmployee, employeeRequestDto is {}", employeeRequestDto);
+
+        EmployeeResponseDto added = employeeService.addEmployee(employeeRequestDto);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .replacePath("/api/employees/{id}")
-                .buildAndExpand(saved.getId())
+                .buildAndExpand(added.getId())
                 .toUri();
 
-        //return ResponseEntity.status(HttpStatus.CREATED).body(saved);
-        return ResponseEntity.created(location).body(saved);
+        logger.info("addEmployee, employee added is {}", added);
+
+        //return ResponseEntity.status(HttpStatus.CREATED).body(added);
+        return ResponseEntity.created(location).body(added); // 201 created
     }
 
     @GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
@@ -97,6 +101,14 @@ public class EmployeeController {
         employeeService.deleteEmployeeById(id);
 
         return ResponseEntity.noContent().build(); //204 - No content
+    }
+
+
+    @GetMapping("/getAllEmployeesWithPagination")
+    public Page<EmployeeResponseDto> getAllEmployeesWithPagination(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
+
+        return employeeService.getAllEmployeesWithPagination(pageable);
     }
 
 }

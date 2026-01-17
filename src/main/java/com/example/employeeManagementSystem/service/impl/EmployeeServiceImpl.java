@@ -1,5 +1,6 @@
 package com.example.employeeManagementSystem.service.impl;
 
+import com.example.employeeManagementSystem.controller.EmployeeController;
 import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
@@ -8,19 +9,20 @@ import com.example.employeeManagementSystem.model.entity.Employee;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+
     private final EmployeeRepository employeeRepository;
     private final ModelMapper mapper;
 
@@ -32,17 +34,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Transactional
     public EmployeeResponseDto addEmployee(EmployeeRequestDto employeeRequestDto){
-        System.out.println("employeeRequestDto is "+employeeRequestDto);
+        logger.info("addEmployee, employeeRequestDto is {}", employeeRequestDto);
         //Employee employee = mapper.map(employeeRequestDto, Employee.class); //ModelMapper did not work
-        //System.out.println("employee is "+employee);
-        Employee employee = new Employee();
-        employee.setName(employeeRequestDto.name());
-        employee.setSalary(employeeRequestDto.salary());
-        employee.setDepartment(employeeRequestDto.department());
-        employee.setEmail(employeeRequestDto.email());
-        //System.out.println("Employee is "+employee);
+
+        Employee employee = mapEmployeeRequestDtoToEmployeeEntity(employeeRequestDto);
+
+        logger.debug("addEmployee, employee is {}", employee);
         Employee saved = employeeRepository.save(employee);
-        //System.out.println("Employed saved is "+saved);
+        logger.info("addEmployee, saved is {}", saved);
         return mapper.map(saved, EmployeeResponseDto.class);
     }
 
@@ -124,7 +123,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setSalary(employeeRequestDto.salary());
         employee.setDepartment(employeeRequestDto.department());
         employee.setEmail(employeeRequestDto.email());
-        //employee.setId(employeeRequestDto.getId());
         return employee;
     }
 
@@ -165,6 +163,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         //Delete
         employeeRepository.delete(employee);
 
+    }
+
+    @Override
+    public Page<EmployeeResponseDto> getAllEmployeesWithPagination(Pageable pageable){
+        Page<Employee> employeeList = employeeRepository.findAll(pageable);
+
+        //map to ResponseDTO
+        return employeeList.map(emp->mapToResponseDto(emp)); // emp->mapToResponseDto(emp) can be this::mapToResponseDto
     }
 
 
