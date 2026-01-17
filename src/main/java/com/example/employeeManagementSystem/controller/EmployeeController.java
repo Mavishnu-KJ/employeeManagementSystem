@@ -87,7 +87,7 @@ public class EmployeeController {
         return ResponseEntity.ok(updated);
     }
 
-    @PutMapping("/updateEmployeeByName/{name}")
+    @PutMapping("/updateEmployeeByName/{name}") //http://localhost:8080/api/employees/updateEmployeeByName/Sachin
     public ResponseEntity<List<EmployeeResponseDto>> updateEmployeeByName(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable ("name") String name){
         logger.info("updateEmployeeByName, employeeRequestDto is {} and name is {}", employeeRequestDto, name);
         List<EmployeeResponseDto> updatedList = employeeService.updateEmployeeByName(employeeRequestDto, name);
@@ -100,7 +100,7 @@ public class EmployeeController {
 
     }
 
-    @DeleteMapping("/deleteEmployeeById/{id}")
+    @DeleteMapping("/deleteEmployeeById/{id}") //http://localhost:8080/api/employees/deleteEmployeeById/4
     public ResponseEntity<HttpStatus> deleteEmployeeById(@PathVariable("id") Long id){
         employeeService.deleteEmployeeById(id);
 
@@ -111,7 +111,7 @@ public class EmployeeController {
     @GetMapping("/getAllEmployeesWithPagination")
     public Page<EmployeeResponseDto> getAllEmployeesWithPagination(
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
-
+        logger.info("getAllEmployeesWithPagination, pageable is {}", pageable);
         return employeeService.getAllEmployeesWithPagination(pageable);
     }
 
