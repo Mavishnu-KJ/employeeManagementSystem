@@ -96,7 +96,7 @@ public class EmployeeController {
     public ResponseEntity<HttpStatus> deleteEmployeeById(@PathVariable("id") Long id){
         employeeService.deleteEmployeeById(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build(); //204 - No content
     }
 
 }
