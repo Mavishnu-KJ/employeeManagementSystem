@@ -86,35 +86,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeResponseDtoList;
     }
 
+    @Override
     public EmployeeResponseDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
+    @Override
     public List<EmployeeResponseDto> getAllEmployees(){
         return employeeRepository.findAll().stream()
                 .map(employee->mapper.map(employee,EmployeeResponseDto.class))
                 .toList();
     }
 
+    @Override
     public EmployeeResponseDto searchEmployeeById(Long id){
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
     }
 
+    @Override
     @Transactional
     public EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id){
+        logger.info("updateEmployeeById, employeeRequestDto is {} and id is {}", employeeRequestDto, id);
+
         Employee existingEmployee = employeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Resource not found for the given id: "+id));
+
+        logger.debug("updateEmployeeById, existingEmployee is {}", existingEmployee);
 
         existingEmployee.setName(employeeRequestDto.name());
         existingEmployee.setSalary(employeeRequestDto.salary());
         existingEmployee.setDepartment(employeeRequestDto.department());
         existingEmployee.setEmail(employeeRequestDto.email());
 
+        logger.debug("updateEmployeeById, existingEmployee after change is {}", existingEmployee);
+
         Employee updated = employeeRepository.save(existingEmployee);
+        logger.info("updateEmployeeById, updated is {}", updated);
         return mapper.map(updated, EmployeeResponseDto.class);
 
     }

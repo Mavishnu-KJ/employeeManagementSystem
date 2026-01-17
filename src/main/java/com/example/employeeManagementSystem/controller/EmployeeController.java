@@ -68,7 +68,7 @@ public class EmployeeController {
         return employeeService.getEmployeeById(id);
     }
 
-    @GetMapping
+    @GetMapping //http://localhost:8080/api/employees
     public List<EmployeeResponseDto> getAllEmployees(){
         return employeeService.getAllEmployees();
     }
@@ -78,9 +78,11 @@ public class EmployeeController {
         return employeeService.searchEmployeeById(id);
     }
 
-    @PutMapping("/updateEmployeeById/{id}")
+    @PutMapping("/updateEmployeeById/{id}") //http://localhost:8080/api/employees/updateEmployeeById/10
     public ResponseEntity<EmployeeResponseDto> updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
+        logger.info("updateEmployeeById, employeeRequestDto is {} and id is {}", employeeRequestDto, id);
         EmployeeResponseDto updated = employeeService.updateEmployeeById(employeeRequestDto, id);
+        logger.info("updateEmployeeById, updated is {}", updated);
         //return ResponseEntity.status(HttpStatus.OK).body(updated);
         return ResponseEntity.ok(updated);
     }
