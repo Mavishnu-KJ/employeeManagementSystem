@@ -89,13 +89,13 @@ public class EmployeeController {
 
     @PutMapping("/updateEmployeeByName/{name}")
     public ResponseEntity<List<EmployeeResponseDto>> updateEmployeeByName(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable ("name") String name){
-
+        logger.info("updateEmployeeByName, employeeRequestDto is {} and name is {}", employeeRequestDto, name);
         List<EmployeeResponseDto> updatedList = employeeService.updateEmployeeByName(employeeRequestDto, name);
 
         if(updatedList==null || updatedList.isEmpty()){
             return ResponseEntity.notFound().build();
         }
-
+        logger.info("updateEmployeeByName, updatedList is {}", updatedList);
         return ResponseEntity.ok(updatedList);
 
     }

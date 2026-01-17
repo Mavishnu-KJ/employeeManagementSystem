@@ -133,11 +133,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional
     public List<EmployeeResponseDto> updateEmployeeByName(EmployeeRequestDto employeeRequestDto, String name) {
+        logger.info("updateEmployeeByName, employeeRequestDto is {} and name is {}", employeeRequestDto, name);
         List<Employee> existingEmployeeList = employeeRepository.findByName(name);
 
         if(existingEmployeeList.isEmpty()){
             throw new ResourceNotFoundException("Resource not found for the name : "+name);
         }
+
+        logger.debug("updateEmployeeByName, existingEmployeeList is {}", existingEmployeeList);
 
         List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<>();
 
@@ -150,10 +153,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             //save
             Employee saved = employeeRepository.save(existingEmployee);
 
+            logger.info("updateEmployeeByName, existingEmployee {} is updated", saved);
+
             //map to dto
             employeeResponseDtoList.add(mapEmployeeEntityToEmployeeResponseDto(saved));
 
         }
+
+        logger.info("updateEmployeeByName, updated Employees List is {} ", employeeResponseDtoList);
 
         return employeeResponseDtoList;
 
