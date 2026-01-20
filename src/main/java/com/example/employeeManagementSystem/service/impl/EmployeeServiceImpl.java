@@ -239,6 +239,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Page<EmployeeResponseDto> searchEmployeesWithPagination(String name, String department, Integer minSalary, Pageable pageable){
 
+        //Specification.where(null) creates WHERE 1=1 SQL structure and so we can add chain conditions (AND/OR)
         Specification<Employee> spec = Specification.where(null); //depricated
 
         if(name!=null && !name.isBlank()){
