@@ -45,9 +45,9 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
    Username: sa
    Password: (blank)
 5. API Base URL: http://localhost:8080/api/employees
-6. API Endpoints 
+## API Endpoints 
 
-  **@PostMapping("/addEmployee") //http://localhost:8080/api/employees/addEmployee
+  **@PostMapping("/addEmployee")
       public ResponseEntity<EmployeeResponseDto> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto)**
   
   => It is used to add one Employee at a time
@@ -58,7 +58,7 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
   => Since its PostMapping and adding new entry, HttpStatus should be 201 Created
   => It is recommended to show location as well in the ResponseEntity 
   
-  **@PostMapping("/addEmployees") //http://localhost:8080/api/employees/addEmployees
+  **@PostMapping("/addEmployees")
       public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@RequestBody List<EmployeeRequestDto> employeeRequestDtoList)**
   
   => It is used to add multiple Employees at a time
@@ -69,7 +69,7 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
   => Since its PostMapping and adding new entry, HttpStatus should be 201 Created
   => It is recommended to show location as well in the ResponseEntity
   
-  **@GetMapping("/{id}") //http://localhost:8080/api/employees/{id}
+  **@GetMapping("/{id}")
       EmployeeResponseDto getEmployeeById(@PathVariable Long id)**
   
   => It uses PathVariable
@@ -82,7 +82,7 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
   => sample url : http://localhost:8080/api/employees
   => It uses the default method findAll() (from JPARepository/CRUD repository)
   
-  **@GetMapping("/searchEmployeeById") //http://localhost:8080/api/employees/searchEmployeeById?id={id}&name={name}
+  **@GetMapping("/searchEmployeeById")
       EmployeeResponseDto searchEmployeeById(@Valid @RequestParam("id") Long id)**  
   
   => Sample url : http://localhost:8080/api/employees/searchEmployeeById?id=1
@@ -172,17 +172,17 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
   => Specification.allOf(specs) - Combines the filters as AND conditions in SQL
   => Specification.anyOf(specs) - Combines the filters as OR conditions in SQL
 
-7. Sample payloads
+## Sample payloads
    See samples/ folder in the repo for JSON examples
-8. Actuator Endpoints (Monitoring)
+## Actuator Endpoints (Monitoring)
    Health: http://localhost:8080/actuator/health
    Metrics: http://localhost:8080/actuator/metrics
    Info: http://localhost:8080/actuator/info
-9. Testing
+## Testing
    Controller tests: @WebMvcTest + MockMvc
    Repository tests: @DataJpaTest
    Service tests: @SpringBootTest + @MockBean
    Run tests: Right-click test classes → Run
-10.Author
+## Author
    Mavishnu KJ
    LinkedIn : www.linkedin.com/in/mavishnu-kj
