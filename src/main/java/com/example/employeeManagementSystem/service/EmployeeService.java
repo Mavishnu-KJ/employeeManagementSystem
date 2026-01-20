@@ -22,4 +22,5 @@ public interface EmployeeService {
     void deleteEmployeeById(Long id);
     Page<EmployeeResponseDto> getAllEmployeesWithPagination(Pageable pageable);
     Page<EmployeeResponseDto> searchEmployeesWithPagination(String name, String department, Integer minSalary, Pageable pageable);
+    Page<EmployeeResponseDto> searchEmployeesWithPagination1(String name, String department, Integer minSalary, Pageable pageable);
 }

@@ -266,4 +266,36 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    @Override
+    public Page<EmployeeResponseDto> searchEmployeesWithPagination1(String name, String department, Integer minSalary, Pageable pageable){
+
+        List<Specification<Employee>> specs = new ArrayList<>();
+
+        if(name!=null && !name.isBlank()){
+            specs.add((root, query, cb)->
+                    cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%")
+            );
+        }
+
+        if(department!=null && !department.isBlank()){
+            specs.add((root, query, cb)->
+                    cb.equal(root.get("department"), department)
+            );
+        }
+
+        if(minSalary != null){
+            specs.add((root, query, cb)->
+                    cb.greaterThanOrEqualTo(root.get("minSalary"), minSalary)
+            );
+        }
+
+        Specification<Employee> spec = Specification.allOf(specs); //allOf for combine as AND conditions, anyOf for combine as OR conditions
+
+        Page<Employee> employeePage = employeeRepository.findAll(spec, pageable);
+
+        return employeePage.map(this::mapEmployeeEntityToEmployeeResponseDto);
+
+    }
+
+
 }

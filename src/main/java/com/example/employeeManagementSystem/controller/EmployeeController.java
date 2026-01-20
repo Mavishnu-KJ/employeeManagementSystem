@@ -143,4 +143,14 @@ public class EmployeeController {
         return employeeService.searchEmployeesWithPagination(employeeName, department, minSalary, pageable);
     }
 
+    @GetMapping("/searchEmployeesWithPagination1")
+    public Page<EmployeeResponseDto> searchEmployeesWithPagination1(@RequestParam(name="name", required = false) String employeeName,
+                                                                   @RequestParam(name="department", required=false) String department,
+                                                                   @RequestParam(name="minSalary", required=false) Integer minSalary,
+                                                                   Pageable pageable){
+
+
+        return employeeService.searchEmployeesWithPagination1(employeeName, department, minSalary, pageable);
+    }
+
 }
