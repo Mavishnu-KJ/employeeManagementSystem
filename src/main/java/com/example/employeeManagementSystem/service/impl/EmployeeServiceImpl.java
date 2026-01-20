@@ -12,9 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @Service
@@ -105,6 +107,34 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(()->new ResourceNotFoundException("Employee not found with id: " + id));
         return mapper.map(employee, EmployeeResponseDto.class);
+    }
+
+    @Override
+    public List<EmployeeResponseDto> searchEmployees(String name, String department, Integer minSalary){
+
+        //Get All employees
+        List<Employee> employeeList = employeeRepository.findAll();
+
+        //Create employees stream - useful for small dataset
+        Stream<Employee> employeesStream = employeeList.stream();
+
+        //Apply dynamic filters
+        if(name !=null && !name.isBlank()){
+            var lowerCaseName = name.toLowerCase();
+            employeesStream = employeesStream.filter(emp->emp.getName().toLowerCase().contains(lowerCaseName));
+        }
+
+        if(department !=null && !department.isBlank()){
+            employeesStream = employeesStream.filter(emp->emp.getDepartment().equalsIgnoreCase(department));
+        }
+
+        if(minSalary != null){
+            employeesStream = employeesStream.filter(emp->emp.getSalary() >= minSalary);
+        }
+
+        //Map to EmployeeResponseDto and then to List
+        return employeesStream.map(this::mapEmployeeEntityToEmployeeResponseDto).toList();
+
     }
 
     @Override
@@ -206,5 +236,34 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeList.map(emp-> mapEmployeeEntityToEmployeeResponseDto(emp)); // emp->mapEmployeeEntityToEmployeeResponseDto(emp) can be this::mapEmployeeEntityToEmployeeResponseDto
     }
 
+    @Override
+    public Page<EmployeeResponseDto> searchEmployeesWithPagination(String name, String department, Integer minSalary, Pageable pageable){
+
+        Specification<Employee> spec = Specification.where(null); //depricated
+
+        if(name!=null && !name.isBlank()){
+            spec = spec.and((root, query, cb)->
+                    cb.like(cb.lower(root.get("name")), "%" + name.toLowerCase() + "%")
+            );
+        }
+
+        if(department!=null && !department.isBlank()){
+            spec = spec.and((root, query, cb)->
+                    cb.equal(root.get("department"), department)
+            );
+        }
+
+        if(minSalary != null){
+            spec = spec.and((root, query, cb)->
+                    cb.greaterThanOrEqualTo(root.get("minSalary"), minSalary)
+            );
+        }
+
+        Page<Employee> employeePage = employeeRepository.findAll(spec, pageable);
+
+        //map to EmployeeResponseDto
+        return employeePage.map(this::mapEmployeeEntityToEmployeeResponseDto);
+
+    }
 
 }

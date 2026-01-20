@@ -15,9 +15,11 @@ public interface EmployeeService {
     EmployeeResponseDto getEmployeeById(Long id);
     List<EmployeeResponseDto> getAllEmployees();
     EmployeeResponseDto searchEmployeeById(Long id);
+    List<EmployeeResponseDto> searchEmployees(String name, String department, Integer minSalary);
     EmployeeResponseDto updateEmployeeById(EmployeeRequestDto employeeRequestDto, Long id);
     List<EmployeeResponseDto> updateEmployeeByName(EmployeeRequestDto employeeRequestDto, String name);
     List<EmployeeResponseDto> addEmployees(List<EmployeeRequestDto> employeeRequestDtoList);
     void deleteEmployeeById(Long id);
     Page<EmployeeResponseDto> getAllEmployeesWithPagination(Pageable pageable);
+    Page<EmployeeResponseDto> searchEmployeesWithPagination(String name, String department, Integer minSalary, Pageable pageable);
 }

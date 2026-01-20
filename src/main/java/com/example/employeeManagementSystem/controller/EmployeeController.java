@@ -73,10 +73,28 @@ public class EmployeeController {
         return employeeService.getAllEmployees();
     }
 
-    @GetMapping("/searchEmployeeById") //http://localhost:8080/api/employees/searchEmployeeById?id={id}&name={name}
+    @GetMapping("/searchEmployeeById") //http://localhost:8080/api/employees/searchEmployeeById?id={id}
     EmployeeResponseDto searchEmployeeById(@Valid @RequestParam("id") Long id){
         return employeeService.searchEmployeeById(id);
     }
+
+    //http://localhost:8080/api/employees/searchEmployees?name={name}
+    //http://localhost:8080/api/employees/searchEmployees?department={department}
+    //http://localhost:8080/api/employees/searchEmployees?minSalary={minSalary}
+    //http://localhost:8080/api/employees/searchEmployees?department={department}&minSalary={minSalary}
+    //http://localhost:8080/api/employees/searchEmployees
+    @GetMapping("/searchEmployees")
+    public ResponseEntity<List<EmployeeResponseDto>> searchEmployees(@RequestParam(name="name", required = false) String employeeName,
+                                              @RequestParam(name="department", required = false) String department,
+                                              @RequestParam(name="minSalary", required = false) Integer minSalary){
+        logger.info("searchEmployees, name is {}, department is {}, minSalary is {}", employeeName, department, minSalary);
+        List<EmployeeResponseDto> resultList = employeeService.searchEmployees(employeeName, department, minSalary);
+
+        logger.info("searchEmployees, resultList is {}", resultList);
+        return ResponseEntity.ok(resultList);
+
+    }
+
 
     @PutMapping("/updateEmployeeById/{id}") //http://localhost:8080/api/employees/updateEmployeeById/10
     public ResponseEntity<EmployeeResponseDto> updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id){
@@ -113,6 +131,16 @@ public class EmployeeController {
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable){
         logger.info("getAllEmployeesWithPagination, pageable is {}", pageable);
         return employeeService.getAllEmployeesWithPagination(pageable);
+    }
+
+    @GetMapping("/searchEmployeesWithPagination")
+    public Page<EmployeeResponseDto> searchEmployeesWithPagination(@RequestParam(name="name", required = false) String employeeName,
+                                                                   @RequestParam(name="department", required=false) String department,
+                                                                   @RequestParam(name="minSalary", required=false) Integer minSalary,
+                                                                   Pageable pageable){
+
+
+        return employeeService.searchEmployeesWithPagination(employeeName, department, minSalary, pageable);
     }
 
 }
