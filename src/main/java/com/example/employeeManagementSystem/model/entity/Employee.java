@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 
 @Entity
@@ -19,6 +20,7 @@ public class Employee {
 
     private Integer salary;
 
+    //@UniqueElements(message = "email ID should be unique")
 
     private String email;
 

@@ -48,7 +48,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/addEmployees") //http://localhost:8080/api/employees/addEmployees
-    public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@RequestBody List<EmployeeRequestDto> employeeRequestDtoList){
+    public ResponseEntity<List<EmployeeResponseDto>> addEmployees (@Valid @RequestBody List<@Valid EmployeeRequestDto> employeeRequestDtoList){
         logger.info("addEmployees, employeeRequestDtoList is {}", employeeRequestDtoList);
         List<EmployeeResponseDto> employeesAdded = employeeService.addEmployees(employeeRequestDtoList);
 
