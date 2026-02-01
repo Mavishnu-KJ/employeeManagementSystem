@@ -1,5 +1,6 @@
 package com.example.employeeManagementSystem.controller;
 
+import com.example.employeeManagementSystem.exception.DuplicateEmailException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
@@ -75,6 +76,30 @@ public class EmployeeControllerTest {
                     .content(objectMapper.writeValueAsString(employeeRequestDto))
                 ).andExpect(status().isBadRequest())
                  .andExpect(jsonPath("$.name").value("must not be blank"));
+    }
+
+    @Test // Test 3: Service throws business exception → custom status (e.g., duplicate email)
+    void testAddEmployee_ServiceThrowsException() throws Exception{
+        //Prepare request DTO
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Sachin",
+                120000,
+                "Cricket",
+                "sachin@gmail.com"
+        );
+
+        //Mock service behavior
+        when(employeeService.addEmployee(any(EmployeeRequestDto.class))).thenThrow(new DuplicateEmailException());
+
+        //Perform post request
+        mockMvc.perform(post("/api/employees/addEmployee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employeeRequestDto))
+                        ).andExpect(status().isConflict())
+                         .andExpect(jsonPath("$.message").value("Email already exists"));
+
+        //Verify service was called once
+        verify(employeeService, times(1)).addEmployee(any(EmployeeRequestDto.class));
     }
 
 
