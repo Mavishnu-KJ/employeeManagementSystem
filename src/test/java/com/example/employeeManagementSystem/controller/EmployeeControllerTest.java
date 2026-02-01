@@ -59,6 +59,23 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).addEmployee(any(EmployeeRequestDto.class));
     }
 
+    @Test // Test 2: Validation Failure - Invalid DTO (blank name) → 400 Bad Request
+    void testAddEmployee_ValidationFailure_BlankName() throws Exception{
+
+        //Prepare request DTO
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto("", 10000, "Cricket", "Rinku@gmail.com");
+
+        //Since its a validation failure test case, skip expected response DTO
+
+        //Since its DTO level validation failure, skip mocking service behavior
+
+        //Perform POST request
+        mockMvc.perform(post("/api/employees/addEmployee")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(employeeRequestDto))
+                ).andExpect(status().isBadRequest())
+                 .andExpect(jsonPath("$.name").value("must not be blank"));
+    }
 
 
 }
