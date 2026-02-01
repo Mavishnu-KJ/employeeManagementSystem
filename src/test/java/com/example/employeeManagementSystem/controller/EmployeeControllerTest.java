@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -76,6 +79,10 @@ public class EmployeeControllerTest {
                     .content(objectMapper.writeValueAsString(employeeRequestDto))
                 ).andExpect(status().isBadRequest())
                  .andExpect(jsonPath("$.name").value("must not be blank"));
+
+        //Verify service was never called
+        verify(employeeService, never()).addEmployee(any(EmployeeRequestDto.class));
+
     }
 
     @Test // Test 3: Service throws business exception → custom status (e.g., duplicate email)
@@ -100,6 +107,88 @@ public class EmployeeControllerTest {
 
         //Verify service was called once
         verify(employeeService, times(1)).addEmployee(any(EmployeeRequestDto.class));
+    }
+
+    @Test
+    void testAddEmployees_Success() throws Exception{
+
+        //Prepare request DTO
+        List<EmployeeRequestDto> employeeRequestDtoList = List.of(
+                new EmployeeRequestDto("Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeRequestDto("Virat", 22222, "Cricket", "virat@gmail.com")
+        );
+
+        //Prepare Response DTO
+        List<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<>();
+        EmployeeResponseDto employeeResponseDto1 = new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com");
+        EmployeeResponseDto employeeResponseDto2 = new EmployeeResponseDto(2L, "Virat", 22222, "Cricket", "virat@gmail.com");
+        employeeResponseDtoList.add(employeeResponseDto1);
+        employeeResponseDtoList.add(employeeResponseDto2);
+
+        //Mock service behavior
+        //when(employeeService.addEmployees(any(List<EmployeeRequestDto.class>))).thenReturn(employeeResponseDtoList);
+        when(employeeService.addEmployees(anyList())).thenReturn(employeeResponseDtoList);
+
+        //Perform POST request
+        mockMvc.perform(post("/api/employees/addEmployees")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employeeRequestDtoList))
+                        ).andExpect(status().isCreated())
+                         .andExpect(header().exists("Location"))
+                         .andExpect(header().string("Location", containsString("/api/employees/addEmployees")))
+                         .andExpect(jsonPath("$").isArray())
+                         .andExpect(jsonPath("$").isNotEmpty())
+                         .andExpect(jsonPath("$.length()").value(2))
+                         .andExpect(jsonPath("$[0].name").value("Sachin"))
+                         .andExpect(jsonPath("$[1].name").value("Virat"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).addEmployees(anyList());
+
+    }
+
+    @Test
+    void testAddEmployees_ValidationFailure_InvalidEmail() throws Exception{
+
+        //Prepare request DTO
+        List<EmployeeRequestDto> employeeRequestDtoList = List.of(
+          new EmployeeRequestDto("Sachin", 88888, "Cricket", "Sachin@gmail.com"),
+          new EmployeeRequestDto("Virat", 22222, "Cricket", "Virat Kohli mail ID")
+        );
+
+        //Perform post request
+        mockMvc.perform(post("/api/employees/addEmployees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDtoList))
+                ).andExpect(status().isBadRequest()) //status 400
+                 .andExpect(jsonPath("$.email").value("must be a well-formed email address"));
+
+        //Verify service was never called
+        verify(employeeService, never()).addEmployees(anyList());
+
+    }
+
+    @Test
+    void testAddEmployees_ServiceThrowsException() throws Exception{
+        //Prepare request Body
+        List<EmployeeRequestDto> employeeRequestDtoList = List.of(
+                new EmployeeRequestDto("Sachin", 88888, "Cricket", "Sachin@gmail.com"),
+                new EmployeeRequestDto("Virat", 22222, "Cricket", "Virat@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.addEmployees(anyList())).thenThrow(new DuplicateEmailException());
+
+        //Perform post request
+        mockMvc.perform(post("/api/employees/addEmployees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDtoList))
+                ).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Email already exists"));
+
+        //Verify service was called once
+        verify(employeeService, times(1)).addEmployees(any()); // NOTE : we can use either anyList() or any(), but any() is more generic and commonly used for lists
+
     }
 
 
