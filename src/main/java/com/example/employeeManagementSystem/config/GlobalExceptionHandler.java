@@ -44,29 +44,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(HandlerMethodValidationException ex){
         Map<String, String> errors = new HashMap<>();
-        //ex.getAllErrors().forEach(e->errors.put(Arrays.toString(e.getArguments()), e.getDefaultMessage()));
 
-        /*
-        ex.getAllErrors().forEach(error -> {
-            String field = Objects.requireNonNull(error.getCodes())[0]; // first code is usually the field
-            errors.put(field, error.getDefaultMessage());
-        });
-
-        */
         ex.getAllErrors().forEach(error -> {
             if (error instanceof FieldError fieldError) {
                 // Keep the full ugly field path with index as-is
-                String fullFieldWithIndex = fieldError.getField();  // e.g. "employeeRequestDtoList[0].name"
+                String field = fieldError.getField();  // e.g. "employeeRequestDtoList[0].name"
                 String message = fieldError.getDefaultMessage();
 
-                errors.put(fullFieldWithIndex, message);
+                errors.put(field, message);
             } else {
                 // Rare global error
                 errors.put("global", error.getDefaultMessage());
             }
         });
-
-
 
         return ResponseEntity.badRequest().body(errors);
     }
@@ -97,12 +87,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEmailException(DuplicateEmailException ex){
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.CONFLICT.value(),
                 ex.getMessage(),
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
 

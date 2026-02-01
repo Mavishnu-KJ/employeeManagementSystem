@@ -1,5 +1,6 @@
 package com.example.employeeManagementSystem.service.impl;
 
+import com.example.employeeManagementSystem.exception.DuplicateEmailException;
 import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
@@ -15,7 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 
@@ -38,6 +41,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         logger.info("addEmployee, employeeRequestDto is {}", employeeRequestDto);
         //Employee employee = mapper.map(employeeRequestDto, Employee.class); //ModelMapper did not work
 
+        //Check If email already exists
+        if(employeeRequestDto != null && !employeeRequestDto.email().isBlank() && employeeRepository.existsByEmail(employeeRequestDto.email())){
+            throw new DuplicateEmailException(employeeRequestDto.email());
+        }
+
         Employee employee = mapEmployeeRequestDtoToEmployeeEntity(employeeRequestDto);
 
         logger.debug("addEmployee, employee is {}", employee);
@@ -56,6 +64,27 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employeeRequestDtoList == null || employeeRequestDtoList.isEmpty()){
             throw new ResourceNotFoundException("No Employees data found to add");
         }
+
+        //Check if email already exists - start
+        //Step 1 : Check if duplicate email found in the request itself
+        Set<String> seenEmails = new HashSet<>();
+        for(EmployeeRequestDto employeeRequestDto : employeeRequestDtoList){
+            if(employeeRequestDto!=null && employeeRequestDto.email()!=null && !employeeRequestDto.email().isBlank()){
+                    if(!seenEmails.add(employeeRequestDto.email())){ // seenEmails.add(employeeRequestDto.email() returns true after addition, else false without adding, HashSet does not allow dupllicates
+                       throw new DuplicateEmailException(employeeRequestDto.email());
+                    }
+            }
+        }
+
+        //Step 2 : Check the given emailList against existing emailList in the DB
+        List<String> givenEmailList = employeeRequestDtoList.stream().map(email->email.email()).toList();
+        if(!givenEmailList.isEmpty()){
+            List<String> matchingEmailListInDB = employeeRepository.findEmailsIn(givenEmailList);
+            for(String email: matchingEmailListInDB){
+                throw new DuplicateEmailException(email);
+            }
+        }
+        //Check if email already exists - end
 
         employeeList = employeeRequestDtoList.stream().map(this::mapEmployeeRequestDtoToEmployeeEntity).toList();
 
