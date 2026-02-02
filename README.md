@@ -103,6 +103,21 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
   => It uses RequestParam
   => It uses the default method findAll() (from JPARepository/CRUD repository), then applies required filters
   
+    Why @Valid is not working on @RequestParam ?
+    
+    @Valid only works on complex objects (DTOs, beans)
+    @Valid tells Spring to validate the entire object (all fields with annotations like @NotBlank, @Positive, @Email).
+    It is designed for @RequestBody (JSON objects), @ModelAttribute (form beans), or method arguments that are complex types (classes with fields).
+    
+    @RequestParam is for simple types
+    Integer minSalary is a primitive wrapper (simple scalar value).
+    Spring does not apply Bean Validation to simple types (String, Integer, Long, etc.) even if you put @Valid on them.
+    @Valid is ignored on simple parameters — it only activates when the parameter is a bean/object with fields to validate.
+    
+    Validation annotations on the parameter itself
+    You can put constraint annotations directly on the @RequestParam (like @Positive, @Min(0)), but not@Valid.    
+
+
   **@PutMapping("/updateEmployeeById/{id}")
       public ResponseEntity<EmployeeResponseDto> updateEmployeeById(@Valid @RequestBody EmployeeRequestDto employeeRequestDto, @PathVariable Long id)**
   

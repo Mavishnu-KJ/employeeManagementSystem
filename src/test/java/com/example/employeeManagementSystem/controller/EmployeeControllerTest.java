@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -380,6 +382,148 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).searchEmployeeById(eq(id));
     }
 
+    @Test
+    @DisplayName("GET http://localhost:8080/api/employees/searchEmployees?name={name}")
+    void testSearchEmployees_Success() throws Exception{
 
+        //Prepare payload request
+        String name = "Sachin";
+
+        //Prepare response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of(
+                new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeResponseDto(2L, "Sachin Tendulkar", 22222, "Cricket", "sachintendulkar@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.searchEmployees(eq(name), isNull(), isNull())).thenReturn(employeeResponseDtoList);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployees").queryParam("name", name)
+                 .accept(MediaType.APPLICATION_JSON)
+                 ).andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Sachin"))
+                .andExpect(jsonPath("$[1].name").value("Sachin Tendulkar"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployees(eq(name), isNull(), isNull());
+
+    }
+
+    @Test
+    @DisplayName("GET http://localhost:8080/api/employees/searchEmployees?department={department}&minSalary={minSalary}")
+    void testSearchEmployees_Success1() throws Exception{
+        //Prepare payload request
+        String department = "Cricket";
+        Integer minSalary = 22222;
+
+        //Prepare response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of(
+                new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeResponseDto(2L, "Sachin Tendulkar", 22222, "Cricket", "sachintendulkar@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.searchEmployees(isNull(), eq(department), eq(minSalary))).thenReturn(employeeResponseDtoList);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployees")
+                    .queryParam("department", department)
+                    .queryParam("minSalary", String.valueOf(minSalary))
+                    .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Sachin"))
+                .andExpect(jsonPath("$[1].name").value("Sachin Tendulkar"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployees(isNull(), eq(department), eq(minSalary));
+
+    }
+
+    @Test
+    @DisplayName("GET http://localhost:8080/api/employees/searchEmployees?name={name}&department={department}&minSalary={minSalary}")
+    void testSearchEmployees_Success2() throws Exception{
+        //Prepare payload request
+        String name = "Sachin";
+        String department = "Cricket";
+        Integer minSalary = 22222;
+
+        //Prepare response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of(
+                new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeResponseDto(2L, "Sachin Tendulkar", 22222, "Cricket", "sachintendulkar@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.searchEmployees(eq(name), eq(department), eq(minSalary))).thenReturn(employeeResponseDtoList);
+
+        //Using queryParams instead of queryParam
+        MultiValueMap<String, String> queryParamsMap = new LinkedMultiValueMap<>();
+        queryParamsMap.add("name", name);
+        queryParamsMap.add("department", department);
+        queryParamsMap.add("minSalary", String.valueOf(minSalary));
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployees")
+                        .queryParams(queryParamsMap)
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Sachin"))
+                .andExpect(jsonPath("$[1].name").value("Sachin Tendulkar"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployees(eq(name), eq(department), eq(minSalary));
+
+    }
+
+    @Test
+    @DisplayName("GET http://localhost:8080/api/employees/searchEmployees?minSalary={minSalary} negative input")
+    void testSearchEmployees_ValidationFailure_NegativeSalary() throws Exception{
+
+        //Prepare invalid payload request
+        Integer negativeSalary = -15000;
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployees").queryParam("minSalary", String.valueOf(negativeSalary))
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.global").value("minSalary must be positive"));
+
+        //Verify the service was never called
+        verify(employeeService, never()).searchEmployees(isNull(), isNull(), eq(negativeSalary));
+    }
+
+    @Test
+    @DisplayName("GET http://localhost:8080/api/employees/searchEmployees?department={department}, SERVICE throws exception")
+    void testSearchEmployees_ServiceThrowsException() throws Exception{
+        //prepare payload request
+        String department = "Cricket";
+
+        //Mock service behavior
+        when(employeeService.searchEmployees(isNull(), eq(department), isNull())).thenThrow(new RuntimeException("Database error"));
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployees").queryParam("department", department)
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Unexpected Error: Database error"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployees(isNull(), eq(department), isNull());
+
+    }
 
 }

@@ -4,6 +4,7 @@ import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -86,7 +87,8 @@ public class EmployeeController {
     @GetMapping("/searchEmployees")
     public ResponseEntity<List<EmployeeResponseDto>> searchEmployees(@RequestParam(name="name", required = false) String employeeName,
                                               @RequestParam(name="department", required = false) String department,
-                                              @RequestParam(name="minSalary", required = false) Integer minSalary){
+                                              @Positive(message = "minSalary must be positive") @RequestParam(name="minSalary", required = false) Integer minSalary){
+
         logger.info("searchEmployees, name is {}, department is {}, minSalary is {}", employeeName, department, minSalary);
         List<EmployeeResponseDto> resultList = employeeService.searchEmployees(employeeName, department, minSalary);
 
