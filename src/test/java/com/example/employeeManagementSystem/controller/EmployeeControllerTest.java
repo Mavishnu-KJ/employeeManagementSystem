@@ -616,7 +616,92 @@ public class EmployeeControllerTest {
 
     }
 
+    @Test
+    void testUpdateEmployeeByName_Success() throws Exception{
+        //Prepare payload request
+        String name = "Sachin";
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Sachin",
+                88888,
+                "Cricket",
+                "sachin@gmail.com");
 
+        //Prepare Mocked response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of(
+                new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeResponseDto(2L, "Sachin", 88888, "Cricket", "sachin@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.updateEmployeeByName(eq(employeeRequestDto), eq(name))).thenReturn(employeeResponseDtoList);
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeByName/{name}", name)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Sachin"))
+                .andExpect(jsonPath("$[1].name").value("Sachin"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).updateEmployeeByName(eq(employeeRequestDto), eq(name));
+    }
+
+    @Test
+    void testUpdateEmployeeByName_ValidationFailure() throws Exception{
+        //Prepare invalid payload request
+        String name = "Sachin";
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "",
+                88888,
+                "Cricket",
+                "sachin@gmail.com");
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeByName/{name}", name)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employeeRequestDto))
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name").value("must not be blank"));
+
+        //Verify the service was never called
+        verify(employeeService, never()).updateEmployeeByName(eq(employeeRequestDto), eq(name));
+    }
+
+    @Test
+    void testUpdateEmployeeByName_ServiceThrowsException() throws Exception{
+        //Prepare invalid payload request
+        String name = "Rajinikanth";
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Rajinikanth",
+                88888,
+                "Cricket",
+                "Rajinikanth@gmail.com");
+
+        //Mock service behavior
+        when(employeeService.updateEmployeeByName(eq(employeeRequestDto),eq(name))).thenThrow(
+          new ResourceNotFoundException("Resource not found for the name : "+name)
+        );
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeByName/{name}", name)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employeeRequestDto))
+                        .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Resource not found for the name : "+name));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).updateEmployeeByName(eq(employeeRequestDto), eq(name));
+    }
 
 
 }

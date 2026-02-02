@@ -16,6 +16,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> findBySalaryGreaterThan(Integer salary);
     List<Employee> findByIdAndName(Long id, String name);
     List<Employee> findByName(String name);
+    List<Employee> findByNameLike(String name);
     Boolean existsByEmail(String email);
     Page<Employee> findAll(Specification<Employee> spec, Pageable pageable);
     @Query("SELECT e.email from Employee e WHERE e.email IN :emailList") //In JPQL (and HQL), you do not use the database table name (employees) in the FROM clause. You must use the entity class name (Employee).
