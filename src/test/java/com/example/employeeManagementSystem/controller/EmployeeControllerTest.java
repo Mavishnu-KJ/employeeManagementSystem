@@ -6,6 +6,7 @@ import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -252,6 +253,71 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).getEmployeeById(eq(id));
 
     }
+
+    @Test
+    @DisplayName("GET /api/employees - Success with multiple employees")
+    void testGetAllEmployees_Success() throws Exception{
+
+        //Prepare Response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of(
+                new EmployeeResponseDto(1L, "Sachin", 88888, "Cricket", "sachin@gmail.com"),
+                new EmployeeResponseDto(2L, "Virat", 22222, "Cricket", "virat@gmail.com")
+        );
+
+        //Mock service behavior
+        when(employeeService.getAllEmployees()).thenReturn(employeeResponseDtoList);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees")
+                ).andExpect(status().isOk())
+                 .andExpect(jsonPath("$").isArray())
+                 .andExpect(jsonPath("$").isNotEmpty())
+                 .andExpect(jsonPath("$.length()").value(2))
+                 .andExpect(jsonPath("$[0].name").value("Sachin"))
+                 .andExpect(jsonPath("$[1].name").value("Virat"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).getAllEmployees();
+
+    }
+
+    @Test
+    @DisplayName("GET /api/employees - Success with empty list")
+    void testGetAllEmployees_SuccessWithEmptyList() throws Exception{
+
+        //Prepare Response
+        List<EmployeeResponseDto> employeeResponseDtoList = List.of();
+
+        //Mock service behavior
+        when(employeeService.getAllEmployees()).thenReturn(employeeResponseDtoList);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees")
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isEmpty())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).getAllEmployees();
+
+    }
+
+    @Test
+    @DisplayName("GET /api/employees - Service throws Exception - 500")
+    void testGetAllEmployees_ServiceThrowsException() throws Exception{
+
+        //Mock service behavior
+        when(employeeService.getAllEmployees()).thenThrow(new RuntimeException("Database error"));
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees")
+                ).andExpect(status().isInternalServerError());
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).getAllEmployees();
+    }
+
 
 
 }
