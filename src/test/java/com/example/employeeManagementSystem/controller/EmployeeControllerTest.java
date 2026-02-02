@@ -1,6 +1,7 @@
 package com.example.employeeManagementSystem.controller;
 
 import com.example.employeeManagementSystem.exception.DuplicateEmailException;
+import com.example.employeeManagementSystem.exception.ResourceNotFoundException;
 import com.example.employeeManagementSystem.model.dto.EmployeeRequestDto;
 import com.example.employeeManagementSystem.model.dto.EmployeeResponseDto;
 import com.example.employeeManagementSystem.service.EmployeeService;
@@ -19,6 +20,7 @@ import java.util.List;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -188,6 +190,66 @@ public class EmployeeControllerTest {
 
         //Verify service was called once
         verify(employeeService, times(1)).addEmployees(any()); // NOTE : we can use either anyList() or any(), but any() is more generic and commonly used for lists
+
+    }
+
+    @Test
+    void testGetEmployeeById_Success() throws Exception{
+
+        //Prepare payload request
+        Long id = 1L;
+
+        //Prepare Response DTO
+        EmployeeResponseDto employeeResponseDto = new EmployeeResponseDto(1L, "Sachin", 88888,"Cricket", "sachin@gmail.com");
+
+        //Mock service behavior
+        when(employeeService.getEmployeeById(anyLong())).thenReturn(employeeResponseDto);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/{id}", id)
+                ).andExpect(status().isOk())
+                 .andExpect(jsonPath("$.id").value(1L))
+                 .andExpect(jsonPath("$.name").value("Sachin"))
+                 .andExpect(jsonPath("$.salary").value(88888))
+                 .andExpect(jsonPath("$.department").value("Cricket"))
+                 .andExpect(jsonPath("$.email").value("sachin@gmail.com"));
+
+        //Verify service was called once
+        verify(employeeService, times(1)).getEmployeeById(eq(id));
+
+    }
+
+    @Test
+    void testGetEmployeeById_ValidationFailure() throws Exception{
+
+        //Prepare payload request
+        String invalidId = "abc";
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/{id}", invalidId)
+                ).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid parameter : id Expected type Long but, got "+invalidId));
+
+        //Verify service was never called
+        verify(employeeService, never()).getEmployeeById(anyLong());
+    }
+
+    @Test
+    void testGetEmployeeById_ServiceThrowsException() throws Exception{
+
+        //Prepare payload request
+        Long id = 999L;
+
+        //Mock service behavior
+        when(employeeService.getEmployeeById(anyLong())).thenThrow(new ResourceNotFoundException());
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/{id}", id)
+                ).andExpect(status().isNotFound())
+                 .andExpect(jsonPath("$.message").value("Resource not found"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).getEmployeeById(eq(id));
 
     }
 
