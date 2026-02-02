@@ -703,5 +703,56 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).updateEmployeeByName(eq(employeeRequestDto), eq(name));
     }
 
+    @Test
+    void testDeleteEmployeeById_Success() throws Exception{
+        //Prepare payload request
+        Long id = 1L;
+
+        //Mock service behavior
+        doNothing().when(employeeService).deleteEmployeeById(eq(id)); //doNothing() as no return value needed
+
+        //Perform DELETE request
+        mockMvc.perform(delete("/api/employees/deleteEmployeeById/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isNoContent()); //204
+
+        //Verify service was called once
+        verify(employeeService, times(1)).deleteEmployeeById(eq(id));
+    }
+
+    @Test
+    void testDeleteEmployeeById_ValidationFailure() throws Exception{
+        //Prepare payload request
+        String invalidId = "abc";
+
+        //Perform DELETE request
+        mockMvc.perform(delete("/api/employees/deleteEmployeeById/{id}", invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isBadRequest()) //400
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Invalid parameter : id Expected type Long but, got "+invalidId));
+
+        //Verify the service was never called
+        verify(employeeService, never()).deleteEmployeeById(anyLong());
+    }
+
+    @Test
+    void testDeleteEmployeeById_ServiceThrowsException() throws Exception{
+        //Prepare payload request
+        Long id = 999L;
+
+        //Mock service behavior
+        doThrow(new ResourceNotFoundException("Resource not found for the Id: "+id)).when(employeeService).deleteEmployeeById(eq(id));
+
+        //Perform DELETE request
+        mockMvc.perform(delete("/api/employees/deleteEmployeeById/{id}", id)
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isNotFound()) //404
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Resource not found for the Id: "+id));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).deleteEmployeeById(eq(id));
+    }
 
 }
