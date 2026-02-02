@@ -23,8 +23,7 @@ import java.util.List;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(EmployeeController.class)
@@ -525,5 +524,99 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).searchEmployees(isNull(), eq(department), isNull());
 
     }
+
+    @Test
+    void testUpdateEmployeeById_Success() throws Exception{
+        //Prepare payload request
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Sachin",
+                88888,
+                "Cricket",
+                "sachin@gmail.com");
+
+        Long id = 1L;
+
+        //Prepare response DTO
+        EmployeeResponseDto employeeResponseDto = new EmployeeResponseDto(
+                1L,
+                "Sachin",
+                88888,
+                "Cricket",
+                "sachin@gmail.com"
+        );
+
+        //Mock service behavior
+        when(employeeService.updateEmployeeById(any(), any())).thenReturn(employeeResponseDto);
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeById/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Sachin"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).updateEmployeeById(eq(employeeRequestDto),eq(id));
+    }
+
+    @Test
+    void testUpdateEmployeeById_ValidationFailure() throws Exception{
+
+        //Prepare invalid payload request
+        Long id = 1L;
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Pant",
+                -100,
+                "Cricket",
+                "pant@gmail.com");
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeById/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isBadRequest()) //400
+                .andExpect(jsonPath("$.salary").value("must be greater than 0"));
+
+        //Verify service was never called
+        verify(employeeService, never()).updateEmployeeById(eq(employeeRequestDto), eq(id));
+
+    }
+
+    @Test
+    void testUpdateEmployeeById_ServiceThrowsException() throws Exception{
+        //Prepare payload request
+        EmployeeRequestDto employeeRequestDto = new EmployeeRequestDto(
+                "Sachin",
+                88888,
+                "Cricket",
+                "sachin@gmail.com");
+
+        Long id = 999L;
+
+        //Mock service behavior
+        when(employeeService.updateEmployeeById(eq(employeeRequestDto), eq(id))).thenThrow(
+          new ResourceNotFoundException("Resource not found for the given id: "+id)
+        );
+
+        //Perform PUT request
+        mockMvc.perform(put("/api/employees/updateEmployeeById/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employeeRequestDto))
+                .accept(MediaType.APPLICATION_JSON)
+                ).andExpect(status().isNotFound()) //404
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value("Resource not found for the given id: "+id));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).updateEmployeeById(eq(employeeRequestDto), eq(id));
+
+    }
+
+
+
 
 }
