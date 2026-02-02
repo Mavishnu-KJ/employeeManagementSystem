@@ -318,6 +318,68 @@ public class EmployeeControllerTest {
         verify(employeeService, times(1)).getAllEmployees();
     }
 
+    @Test
+    void testSearchEmployeeById_Success() throws Exception{
+        //Prepare payload request
+        Long id = 1L;
+
+        //Prepare response
+        EmployeeResponseDto employeeResponseDto = new EmployeeResponseDto(
+                1L,
+                "Sachin",
+                88888,
+                "Cricket",
+                "sachin@gmail.com"
+        );
+
+        //Mock service behavior
+        when(employeeService.searchEmployeeById(anyLong())).thenReturn(employeeResponseDto);
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployeeById").queryParam("id", String.valueOf(id))
+                ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Sachin"))
+                .andExpect(jsonPath("$.salary").value(88888))
+                .andExpect(jsonPath("$.department").value("Cricket"))
+                .andExpect(jsonPath("$.email").value("sachin@gmail.com"));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployeeById(id);
+    }
+
+    @Test
+    void testSearchEmployeeById_ValidationFailure() throws Exception{
+        //Prepare invalid payload request
+        String id = "abc";
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployeeById").queryParam("id", id)
+                ).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid parameter : id Expected type Long but, got abc"));
+
+        //Verify the service was never called
+        verify(employeeService, never()).searchEmployeeById(anyLong());
+    }
+
+
+    @Test
+    void testSearchEmployeeById_ServiceThrowsException() throws Exception{
+        //Prepare payload request
+        Long id = 999L;
+
+        //Mock service behavior
+        when(employeeService.searchEmployeeById(anyLong())).thenThrow(new ResourceNotFoundException("Employee not found with id: " + id));
+
+        //Perform GET request
+        mockMvc.perform(get("/api/employees/searchEmployeeById").queryParam("id", String.valueOf(id))
+                ).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Employee not found with id: " + id));
+
+        //Verify the service was called once
+        verify(employeeService, times(1)).searchEmployeeById(eq(id));
+    }
+
 
 
 }
