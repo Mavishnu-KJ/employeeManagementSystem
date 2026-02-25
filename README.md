@@ -181,7 +181,7 @@ public Page<EmployeeResponseDto> searchEmployeesWithPagination1(@RequestParam(na
 @RequestParam(name="minSalary", required=false) Integer minSalary,
 Pageable pageable)**
 
-- => This serves the same purpose of searchEmployeesWithPagination1
+- => This serves the same purpose of searchEmployeesWithPagination
 - => Since the below line is depricated, we used modern ways speciation.allOf(specs), Specification.anyOf(specs)
   Specification<Employee> spec = Specification.where(null);
 - => Specification.allOf(specs) - Combines the filters as AND conditions in SQL
