@@ -103,7 +103,7 @@ public ResponseEntity<List<EmployeeResponseDto>> searchEmployees(@RequestParam(n
 - => It uses RequestParam
 - => It uses the default method findAll() (from JPARepository/CRUD repository), then applies required filters
 
-  Why @Valid is not working on @RequestParam ?
+- => Why @Valid is not working on @RequestParam ?
 
   - => @Valid only works on complex objects (DTOs, beans)
   - => @Valid tells Spring to validate the entire object (all fields with annotations like @NotBlank, @Positive, @Email).
