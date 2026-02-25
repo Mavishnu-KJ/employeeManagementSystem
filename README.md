@@ -105,17 +105,17 @@ public ResponseEntity<List<EmployeeResponseDto>> searchEmployees(@RequestParam(n
 
   Why @Valid is not working on @RequestParam ?
 
-  @Valid only works on complex objects (DTOs, beans)
-  @Valid tells Spring to validate the entire object (all fields with annotations like @NotBlank, @Positive, @Email).
-  It is designed for @RequestBody (JSON objects), @ModelAttribute (form beans), or method arguments that are complex types (classes with fields).
+  - => @Valid only works on complex objects (DTOs, beans)
+  - => @Valid tells Spring to validate the entire object (all fields with annotations like @NotBlank, @Positive, @Email).
+  - => It is designed for @RequestBody (JSON objects), @ModelAttribute (form beans), or method arguments that are complex types (classes with fields).
 
-  @RequestParam is for simple types
-  Integer minSalary is a primitive wrapper (simple scalar value).
-  Spring does not apply Bean Validation to simple types (String, Integer, Long, etc.) even if you put @Valid on them.
-  @Valid is ignored on simple parameters — it only activates when the parameter is a bean/object with fields to validate.
+  - => @RequestParam is for simple types
+  - => Integer minSalary is a primitive wrapper (simple scalar value).
+  - => Spring does not apply Bean Validation to simple types (String, Integer, Long, etc.) even if you put @Valid on them.
+  - => @Valid is ignored on simple parameters — it only activates when the parameter is a bean/object with fields to validate.
 
-  Validation annotations on the parameter itself
-  You can put constraint annotations directly on the @RequestParam (like @Positive, @Min(0)), but not@Valid.
+  - => Validation annotations on the parameter itself
+  - => You can put constraint annotations directly on the @RequestParam (like @Positive, @Min(0)), but not@Valid.
 
 
 **@PutMapping("/updateEmployeeById/{id}")
@@ -188,16 +188,16 @@ Pageable pageable)**
 - => Specification.anyOf(specs) - Combines the filters as OR conditions in SQL
 
 ## Sample payloads
-See samples/ folder in the repo for JSON examples
+- See samples/ folder in the repo for JSON examples
 ## Actuator Endpoints (Monitoring)
-Health: http://localhost:8080/actuator/health
-Metrics: http://localhost:8080/actuator/metrics
-Info: http://localhost:8080/actuator/info
+- Health: http://localhost:8080/actuator/health
+- Metrics: http://localhost:8080/actuator/metrics
+- Info: http://localhost:8080/actuator/info
 ## Testing
-Controller tests: @WebMvcTest + MockMvc
-Repository tests: @DataJpaTest
-Service tests: @SpringBootTest + @MockBean
-Run tests: Right-click test classes → Run
+- Controller tests: @WebMvcTest + MockMvc
+- Repository tests: @DataJpaTest
+- Service tests: @SpringBootTest + @MockBean
+- Run tests: Right-click test classes → Run
 ## Author
-Mavishnu KJ
+- Mavishnu KJ
 LinkedIn : www.linkedin.com/in/mavishnu-kj
