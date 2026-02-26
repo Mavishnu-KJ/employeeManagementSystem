@@ -255,6 +255,17 @@ Pageable pageable)**
 - => Specification.allOf(specs) - Combines the filters as AND conditions in SQL
 - => Specification.anyOf(specs) - Combines the filters as OR conditions in SQL
 
+## Global Exception Handler - handled exceptions List
+
+1. MethodArgumentNotValidException
+2. MethodArgumentTypeMismatchException
+3. BindException
+4. HandlerMethodValidationException
+5. ConstraintViolationException
+6. ResourceNotFoundException (Custom exception)
+7. DuplicateEmailException (Custom exception)
+8. Exception
+
 ## Sample payloads
 - See samples/ folder in the repo for JSON examples
 ## Actuator Endpoints (Monitoring)
