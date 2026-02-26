@@ -57,27 +57,27 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
             - └── employeemanagementsystem/
                 - ├── EmployeeManagementSystemApplication.java   ← Main Spring Boot entry point
                 - ├── config/                                    ← Configuration classes
-                - │	  └── DataBaseHealthIndicator.java
-                - │	  └── GlobalExceptionHandler.java
-                - │	  └── ModelMapperConfig.java
+                - │	- └── DataBaseHealthIndicator.java
+                - │	- └── GlobalExceptionHandler.java
+                - │	- └── ModelMapperConfig.java
                 - ├── controller/                                ← REST Controllers
-                - │     └── EmployeeController.java
+                - │   - └── EmployeeController.java
                 - ├── model/
-                - │	  ├── dto/                                       ← Data Transfer Objects
-                - │	  ├     ├── EmployeeRequestDto.java
-                - │	  ├     ├── EmployeeResponseDto.java
-                - │	  ├     └── ErrorResponse.java
-                - │	  └── entity/                                    ← JPA Entities
-                - │	      └── Employee.java
+                - │	- ├── dto/                                       ← Data Transfer Objects
+                - │	- ├   - ├── EmployeeRequestDto.java
+                - │	- ├   - ├── EmployeeResponseDto.java
+                - │	- ├   - └── ErrorResponse.java
+                - │	- └── entity/                                    ← JPA Entities
+                - │	    - └── Employee.java
                 - ├── exception/                                 ← Custom exceptions
-                - │     ├── DuplicateEmailException.java
-                - │     └── ResourceNotFoundException.java
+                - │   - ├── DuplicateEmailException.java
+                - │   - └── ResourceNotFoundException.java
                 - ├── repository/                                ← Spring Data JPA Repositories
-                - │     └── EmployeeRepository.java
+                - │   - └── EmployeeRepository.java
                 - ├── service/                                   ← Business logic layer
-                - │	  ├── impl/
-                - │	  │	  └── EmployeeServiceImpl.java
-                - │	  └── EmployeeService.java
+                - │	- ├── impl/
+                - │	- │	- └── EmployeeServiceImpl.java
+                - │	- └── EmployeeService.java
                 - └── util/
 - └── src/test/java/
     - └── com/
@@ -85,9 +85,9 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
             - └── employeemanagementsystem/
                 - ├── EmployeeManagementSystemApplicationTests.java   ← Basic context load test
                 - ├── controller/                                     ← Controller tests
-                - │     └── EmployeeControllerTest.java
+                - │   - └── EmployeeControllerTest.java
                 - ├── repository/                                     ← Repository tests
-                - │     └── EmployeeRepositoryTest.java
+                - │   - └── EmployeeRepositoryTest.java
                 - └── service/                                        ← Service tests
                     - └── EmployeeServiceTest.java
 
@@ -95,9 +95,9 @@ A **full-featured RESTful API** built with Spring Boot for managing employees. I
 
 - employeeManagementSystem/
 - ├──src/main/resources/
-- │     └── application.properties
-- │     └── application-test.properties
-- └──target/        ← Compiled classes, JAR file, etc
+- │   - └── application.properties
+- │   - └── application-test.properties
+- └──target/          ← Compiled classes, JAR file, etc
 
 ## API Endpoints
 
