@@ -101,6 +101,20 @@ Other Important Folders/Files :
 
 ## API Endpoints
 
+01. /addEmployee
+02. /addEmployees
+03. /{id}
+04. /getEmployeeById
+05. /getAllEmployees
+06. /searchEmployeeById
+07. /searchEmployees
+08. /updateEmployeeById/{id}
+09. /updateEmployeeByName/{name}
+10. /deleteEmployeeById/{id}
+11. /getAllEmployeesWithPagination
+12. /searchEmployeesWithPagination
+13. /searchEmployeesWithPagination1
+
 **@PostMapping("/addEmployee")
 public ResponseEntity<EmployeeResponseDto> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto)**
 
