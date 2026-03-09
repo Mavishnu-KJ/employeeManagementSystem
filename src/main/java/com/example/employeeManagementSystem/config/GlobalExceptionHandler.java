@@ -25,7 +25,7 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    //handler for single object (eg. /addEmployee)
+    //handler for single object (eg. /addEmployee name must not be blank, salary must be greater than 0)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex){
         Map<String, String> errors = new HashMap<>();
@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    //eg. GetMapping("/api/employees/{id}", /api/employees/abc)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex){
         String message = "Invalid parameter : "+ex.getName()+" Expected type "+ex.getRequiredType().getSimpleName() +" but, got "+ex.getValue();

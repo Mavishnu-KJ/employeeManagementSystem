@@ -31,6 +31,15 @@ public class Employee {
 
     }
 
+    //Parameterized constructor required for test cases
+    public Employee(Long id, String name, Integer salary, String email, String department) {
+        this.id = id;
+        this.name = name;
+        this.salary = salary;
+        this.email = email;
+        this.department = department;
+    }
+
     public Long getId() {
         return id;
     }
